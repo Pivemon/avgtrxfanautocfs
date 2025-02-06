@@ -126,7 +126,7 @@ function postConfessionsToFacebook() {
     if (json.id) {
       Logger.log("Đăng bài thành công! ID bài viết: " + json.id);
 
-      // Cập nhật công thức trong E2 để tham chiếu đến ô C(x+20)
+      // Cập nhật công thức trong E2 để tham chiếu đến ô C(x+10)
       var nextRow = startRow + 10;
       sheet.getRange("E2").setFormula("=C" + nextRow);
     } else {
