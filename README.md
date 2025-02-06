@@ -4,9 +4,9 @@
 
 ![image](https://github.com/user-attachments/assets/899ae583-7d92-4b6c-a7eb-4164b6a45be0)
 
-*Tuy vậy nhưng tôi lười vcl nên chắc tỷ năm tôi mới mò vào đăng bài 1 lần, mà đặc điểm của confession là phải update liên tục nó mới nóng hổi mới hay.*
+*Tuy vậy nhưng tôi lười vcl nên chắc tỷ năm tôi mới mò vào đăng bài 1 lần, khổ nỗi confession là phải update liên tục nó mới nóng hổi mới hay.*
 
-*Dù thế nhưng tôi vẫn rất yêu cái page này, vì vậy nên mặc dù đéo biết gì về code cả, tôi đã bắt tay vào mò các dùng ChatGPT để chế tool đăng bài tự động. Ban đầu tôi nghĩ chắc nhanh cũng phải mất tầm 5 6 hôm, thế đéo nào 2 tiếng xong mẹ rồi, công nhận AI bây giờ xịn thật :v :v*
+*Dù thế nhưng tôi vẫn rất yêu cái page này, vì vậy nên mặc dù đéo biết gì về code cả, tôi đã bắt tay vào mò cách dùng ChatGPT để chế tool đăng bài tự động. Ban đầu tôi nghĩ chắc nhanh cũng phải mất tầm 5 6 hôm, thế đéo nào 2 tiếng xong mẹ rồi, công nhận AI bây giờ xịn thật :v :v*
 
 Thôi xàm lìn thế đủ rồi, bây giờ tôi sẽ nói về những tính năng chính và cách setup + sử dụng.
 
