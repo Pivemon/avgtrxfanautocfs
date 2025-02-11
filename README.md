@@ -22,4 +22,5 @@ Tool sử dụng Google Apps Script lấy thông tin các bài đăng được l
 - Đăng bài hàng ngày vào khoảng thời gian chỉ định
 - Tự động làm mới access token Facebook và hủy token sau khoảng thời gian tùy chỉnh
 
-*Tý đi ăn về t viết tiếp👍👍👍*
+~~Tý đi ăn về t viết tiếp👍👍👍~~
+> Định hôm nay update thêm phần Instagram nhưng buồn ngủ quá, mai up sau.
