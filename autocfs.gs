@@ -168,3 +168,82 @@ function createTimeDrivenTrigger() {
       .atHour(3)      // Thời gian chạy là 3 giờ sáng
       .create();
 } */
+
+function postConfessionsToInstagram() {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Câu trả lời biểu mẫu");
+  var e2Formula = sheet.getRange("F2").getFormula();
+  var match = e2Formula.match(/C(\d+)/i);
+  
+  if (!match) {
+    Logger.log("Không tìm thấy ô tham chiếu trong F2.");
+    return;
+  }
+  
+  var startRow = parseInt(match[1]);
+  var endRow = startRow + 9;
+  var values = sheet.getRange("C" + startRow + ":C" + endRow).getValues();
+  
+  if (values.flat().join("").trim() === "") {
+    Logger.log("Không có confession nào để đăng.");
+    return;
+  }
+  
+  var today = new Date();
+  var day = today.getDate();
+  var month = today.getMonth() + 1; // Tháng trong JS bắt đầu từ 0 nên cần +1
+  var year = today.getFullYear();
+  var formattedDate = "Confessions ngày " + day + " tháng " + month + " năm " + year + "\n";
+
+  var postContent = formattedDate;
+  values.forEach(function(row, index) {
+    if (row[0].trim() !== "") {
+      postContent += "\n#cfs" + (startRow + index + 997) + "\n" + row[0] + "\n";
+    }
+  });
+  postContent += "🌸💮🌸💮🌸";
+  
+  var imgurImageUrl = "https://i.imgur.com/caigiday"; // Thay bằng link ảnh Imgur thật
+  var pageAccessToken = getStoredToken();
+  var instagramAccountId = "YOUR_ID"; //Thay bằng Instagram Business ID của bạn
+  
+  var createMediaUrl = "https://graph.facebook.com/v22.0/" + instagramAccountId + "/media";
+  var createMediaOptions = {
+    method: "post",
+    payload: {
+      image_url: imgurImageUrl,
+      caption: postContent,
+      access_token: pageAccessToken
+    }
+  };
+  
+  try {
+    var response = UrlFetchApp.fetch(createMediaUrl, createMediaOptions);
+    var json = JSON.parse(response.getContentText());
+    
+    if (json.id) {
+      var publishUrl = "https://graph.facebook.com/v22.0/" + instagramAccountId + "/media_publish";
+      var publishOptions = {
+        method: "post",
+        payload: {
+          creation_id: json.id,
+          access_token: pageAccessToken
+        }
+      };
+      
+      var publishResponse = UrlFetchApp.fetch(publishUrl, publishOptions);
+      var publishJson = JSON.parse(publishResponse.getContentText());
+      
+      if (publishJson.id) {
+        Logger.log("Đăng bài thành công! ID bài viết: " + publishJson.id);
+        var nextRow = startRow + 10;
+        sheet.getRange("F2").setFormula("=C" + nextRow);
+      } else {
+        Logger.log("Lỗi khi xuất bản bài: " + publishResponse.getContentText());
+      }
+    } else {
+      Logger.log("Lỗi khi tạo media: " + response.getContentText());
+    }
+  } catch (e) {
+    Logger.log("Lỗi: " + e.toString());
+  }
+}
