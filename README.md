@@ -3,6 +3,8 @@
 *Chuyện là tôi có mở một cái confession ở trường cấp 3 của tôi do cái cũ sập rồi (lí do khó nói), ban đầu định làm cho vui thôi, không ngờ các bạn cũng khá là hưởng ứng.*
 
 ![image](https://github.com/user-attachments/assets/899ae583-7d92-4b6c-a7eb-4164b6a45be0)
+<!-- ![image](https://github.com/user-attachments/assets/b00051f0-c905-4e24-88bf-ba8764d63ee3) -->
+
 
 *Tuy vậy nhưng tôi lười vcl nên chắc tỷ năm tôi mới mò vào đăng bài 1 lần, khổ nỗi confession là phải update liên tục nó mới nóng hổi mới hay.*
 
