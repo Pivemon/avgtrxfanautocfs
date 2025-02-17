@@ -90,11 +90,14 @@ function postConfessionsToFacebook() {
   var endRow = startRow + 9; // Lấy 20 dòng từ Cx -> C(x+19)
   var values = sheet.getRange("C" + startRow + ":C" + endRow).getValues(); // Lấy dữ liệu
 
-  // Kiểm tra xem có dữ liệu không
-  if (values.flat().join("").trim() === "") {
-    Logger.log("Không có confession nào để đăng.");
+  // Kiểm tra xem tất cả 10 ô đều có dữ liệu
+  var allHaveData = values.every(row => row[0].trim() !== "");
+
+  if (!allHaveData) {
+    Logger.log("Không đủ 10 confession để đăng.");
     return;
   }
+
 
   // Định dạng nội dung bài đăng
   var postContent = "🌸💮🌸💮🌸\n";
@@ -183,11 +186,14 @@ function postConfessionsToInstagram() {
   var endRow = startRow + 9;
   var values = sheet.getRange("C" + startRow + ":C" + endRow).getValues();
   
-  if (values.flat().join("").trim() === "") {
-    Logger.log("Không có confession nào để đăng.");
+  // Kiểm tra xem tất cả 10 ô đều có dữ liệu
+  var allHaveData = values.every(row => row[0].trim() !== "");
+
+  if (!allHaveData) {
+    Logger.log("Không đủ 10 confession để đăng.");
     return;
   }
-  
+
   var today = new Date();
   var day = today.getDate();
   var month = today.getMonth() + 1; // Tháng trong JS bắt đầu từ 0 nên cần +1
