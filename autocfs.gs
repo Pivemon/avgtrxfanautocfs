@@ -185,7 +185,7 @@ function postConfessionsToInstagram() {
   var startRow = parseInt(match[1]);
   var endRow = startRow + 9;
   var values = sheet.getRange("C" + startRow + ":C" + endRow).getValues();
-  
+
   // Kiểm tra xem tất cả 10 ô đều có dữ liệu
   var allHaveData = values.every(row => row[0].trim() !== "");
 
@@ -196,60 +196,113 @@ function postConfessionsToInstagram() {
 
   var today = new Date();
   var day = today.getDate();
-  var month = today.getMonth() + 1; // Tháng trong JS bắt đầu từ 0 nên cần +1
+  var month = today.getMonth() + 1;
   var year = today.getFullYear();
-  var formattedDate = "Confessions ngày " + day + " tháng " + month + " năm " + year + "\n";
+  var baseTitle = "Confessions ngày " + day + " tháng " + month + " năm " + year;
 
-  var postContent = formattedDate;
-  values.forEach(function(row, index) {
-    if (row[0].trim() !== "") {
-      postContent += "\n#cfs" + (startRow + index + 997) + "\n" + row[0] + "\n";
-    }
-  });
-  postContent += "🌸💮🌸💮🌸";
-  
+  var maxCaptionLength = 2200;
   var imgurImageUrl = "https://i.imgur.com/caigiday"; // Thay bằng link ảnh Imgur thật
   var pageAccessToken = getStoredToken();
   var instagramAccountId = "YOUR_ID"; //Thay bằng Instagram Business ID của bạn
+
+  var currentCaption = "";
+  var captions = [];
   
-  var createMediaUrl = "https://graph.facebook.com/v22.0/" + instagramAccountId + "/media";
-  var createMediaOptions = {
-    method: "post",
-    payload: {
-      image_url: imgurImageUrl,
-      caption: postContent,
-      access_token: pageAccessToken
-    }
-  };
-  
-  try {
-    var response = UrlFetchApp.fetch(createMediaUrl, createMediaOptions);
-    var json = JSON.parse(response.getContentText());
+  values.forEach(function(row, index) {
+    var confessionText = "\n#cfs" + (startRow + index + 997) + "\n" + row[0] + "\n";
     
-    if (json.id) {
-      var publishUrl = "https://graph.facebook.com/v22.0/" + instagramAccountId + "/media_publish";
-      var publishOptions = {
+    if (currentCaption.length + confessionText.length > maxCaptionLength) {
+      captions.push(currentCaption + "🌸💮🌸💮🌸");
+      currentCaption = confessionText; // Bắt đầu bài mới
+    } else {
+      currentCaption += confessionText;
+    }
+  });
+
+  if (currentCaption.length > 0) {
+    captions.push(currentCaption + "🌸💮🌸💮🌸");
+  }
+
+  try {
+    for (var i = 0; i < captions.length; i++) {
+      var totalParts = captions.length;
+      var title = totalParts > 1 ? `${baseTitle} (Phần ${i + 1}/${totalParts})` : baseTitle;
+      var caption = title + "\n" + captions[i];
+
+      var createMediaUrl = "https://graph.facebook.com/v22.0/" + instagramAccountId + "/media";
+      var createMediaOptions = {
         method: "post",
         payload: {
-          creation_id: json.id,
+          image_url: imgurImageUrl,
+          caption: caption,
           access_token: pageAccessToken
         }
       };
-      
-      var publishResponse = UrlFetchApp.fetch(publishUrl, publishOptions);
-      var publishJson = JSON.parse(publishResponse.getContentText());
-      
-      if (publishJson.id) {
-        Logger.log("Đăng bài thành công! ID bài viết: " + publishJson.id);
-        var nextRow = startRow + 10;
-        sheet.getRange("F2").setFormula("=C" + nextRow);
+
+      var response = UrlFetchApp.fetch(createMediaUrl, createMediaOptions);
+      var json = JSON.parse(response.getContentText());
+
+      if (json.id) {
+        var publishUrl = "https://graph.facebook.com/v22.0/" + instagramAccountId + "/media_publish";
+        var publishOptions = {
+          method: "post",
+          payload: {
+            creation_id: json.id,
+            access_token: pageAccessToken
+          }
+        };
+
+        var publishResponse = UrlFetchApp.fetch(publishUrl, publishOptions);
+        var publishJson = JSON.parse(publishResponse.getContentText());
+
+        if (publishJson.id) {
+          Logger.log("Đăng phần " + (i + 1) + " thành công! ID bài viết: " + publishJson.id);
+        } else {
+          Logger.log("Lỗi khi xuất bản phần " + (i + 1) + ": " + publishResponse.getContentText());
+        }
       } else {
-        Logger.log("Lỗi khi xuất bản bài: " + publishResponse.getContentText());
+        Logger.log("Lỗi khi tạo media phần " + (i + 1) + ": " + response.getContentText());
       }
-    } else {
-      Logger.log("Lỗi khi tạo media: " + response.getContentText());
     }
+
+    var nextRow = startRow + 10;
+    sheet.getRange("F2").setFormula("=C" + nextRow);
   } catch (e) {
     Logger.log("Lỗi: " + e.toString());
   }
+}
+
+function previewConfessionPost() {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Câu trả lời biểu mẫu"); // Lấy sheet
+  var e2Formula = sheet.getRange("E2").getFormula(); // Lấy công thức từ ô E2
+  var match = e2Formula.match(/C(\d+)/i); // Tìm số hàng mà E2 đang tham chiếu đến
+
+  if (!match) {
+    Logger.log("Không tìm thấy ô tham chiếu trong E2.");
+    return;
+  }
+
+  var startRow = parseInt(match[1]); // Lấy số hàng từ công thức trong E2
+  var endRow = startRow + 9; // Lấy 10 dòng từ Cx -> C(x+9)
+  var values = sheet.getRange("C" + startRow + ":C" + endRow).getValues(); // Lấy dữ liệu
+
+  // Kiểm tra xem tất cả 10 ô đều có dữ liệu
+  var allHaveData = values.every(row => row[0].trim().length > 0);
+
+  if (!allHaveData) {
+    Logger.log("❌ Không đủ 10 confession để đăng.");
+    return;
+  }
+
+  // Định dạng nội dung bài đăng
+  var postContent = "🌸💮🌸💮🌸\n\n";
+  values.forEach(function(row, index) {
+    if (row[0].trim().length > 0) { // Bỏ qua dòng trống
+      postContent += "#cfs" + (startRow + index + 997) + "\n" + row[0] + "\n\n";
+    }
+  });
+  postContent += "🌸💮🌸💮🌸\n\n[Confessions hiện đã có mặt trên Instagram]\nhttps://www.instagram.com/avgtrxfancfs/";
+
+  // Hiển thị nội dung qua Logger
+  Logger.log("📢 Xem trước bài đăng:\n" + postContent);
 }
